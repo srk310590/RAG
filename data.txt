@@ -1,0 +1,6 @@
+The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France. It is named after the engineer Gustave Eiffel, whose company designed and built the tower.
+The Eiffel Tower was constructed from 1887 to 1889 as the centerpiece of the 1889 World's Fair.
+It is the tallest structure in Paris and one of the most-visited paid monuments in the world.
+The Statue of Liberty is a colossal neoclassical sculpture on Liberty Island in New York Harbor in New York City, in the United States.
+The Statue of Liberty was dedicated on October 28, 1886.
+The statue is a figure of Libertas, a robed Roman liberty goddess.
