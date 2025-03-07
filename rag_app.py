@@ -71,45 +71,19 @@ def create_retrieval_qa_chain(db):
     return qa_chain
 
 
-def main():
-    """Main function to run the RAG application."""
-    print("Main function to run the RAG application.")
-    # Load and chunk data (replace with your data source)
-    file_path = "data.txt"  # change this
+def build_rag_pipeline(file_path="data.txt"):
+    """Builds the entire RAG pipeline."""
+    print("Building RAG pipeline...")
     try:
-      print("Loading and chunking data...")
-      texts = load_and_chunk_data(file_path)
-      print(texts)
+        texts = load_and_chunk_data(file_path)
     except Exception as e:
-      print(f"Error loading or chunking data: {e}")
-      return
+        print(f"Error loading or chunking data: {e}")
+        raise e  # Re-raise the exception to be handled upstream
 
     try:
-      # Create the vector store
-      print("Creating the vector store...")
-      print(os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT"))
-      print(os.getenv("AZURE_OPENAI_ENDPOINT"))
-      print(os.getenv("AZURE_OPENAI_API_KEY"))
-      print(os.getenv("AZURE_OPENAI_API_VERSION"))
-      print(os.getenv("AZURE_OPENAI_COMPLETION_DEPLOYMENT"))
-      print(texts)
-      db = create_vector_store(texts)
-      print(db)
-      # Create the retrieval QA chain
-      print("Creating the retrieval QA chain...")
-      qa_chain = create_retrieval_qa_chain(db)
-      print(qa_chain)
-      # Ask questions
-      while True:
-        query = input("Enter your question (or type 'exit' to quit): ")
-        if query.lower() == "exit":
-            break
-        result = qa_chain.run(query)
-        print(f"Answer: {result}\n")
-
-
-    except Exception as e: 
-      print(f"An error occurred during vector store creation or QA chain setup: {e}")
-
-if __name__ == "__main__":
-    main()
+        db = create_vector_store(texts)
+        qa_chain = create_retrieval_qa_chain(db)
+        return qa_chain
+    except Exception as e:
+        print(f"Error creating vector store or QA chain: {e}")
+        raise e  # Re-raise the exception to be handled upstream
