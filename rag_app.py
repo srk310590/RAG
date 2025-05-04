@@ -6,6 +6,11 @@ from langchain_community.chat_models import AzureChatOpenAI
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 from langchain_openai import AzureOpenAIEmbeddings
+from azure.identity import ClientSecretCredential
+from azure.identity import DefaultAzureCredential
+from azure.keyvault.secrets import SecretClient
+import os
+
 
 # Load environment variables
 load_dotenv()
@@ -13,6 +18,28 @@ load_dotenv()
 # Set up Azure OpenAI - THIS IS REQUIRED
 os.environ["OPENAI_API_TYPE"] = "azure"
 
+client_id = os.environ['AZURE_CLIENT_ID']
+tenant_id = os.environ['AZURE_TENANT_ID']
+client_secret = os.environ['AZURE_CLIENT_SECRET']
+vault_url = os.environ["AZURE_VAULT_URL"]
+
+secret_name = 'openaiapikey'
+
+# create a credential 
+credentials = ClientSecretCredential(
+    client_id = client_id, 
+    client_secret= client_secret,
+    tenant_id= tenant_id
+)
+
+#credentials = DefaultAzureCredential()
+
+# create a secret client object
+secret_client = SecretClient(vault_url= vault_url, credential= credentials)
+
+
+# retrieve the secret value from key vault
+secret = secret_client.get_secret(secret_name)
 
 def load_and_chunk_data(file_path, loader_class):
     """Loads and chunks data from a file."""
@@ -29,7 +56,8 @@ def create_vector_store(texts):
         model=os.getenv("AZURE_OPENAI_EMBEDDING_DEPLOYMENT"),
         chunk_size=2000,
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-        api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        #api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        api_key = secret.value,
         api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
     )
     db = FAISS.from_documents(texts, embeddings)
@@ -44,7 +72,8 @@ def create_retrieval_qa_chain(db):
         temperature=0.7,
         azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
         openai_api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
-        openai_api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        #openai_api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+        openai_api_key = secret.value
     )
 
     retriever = db.as_retriever()
